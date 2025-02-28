@@ -1,5 +1,6 @@
 // src/Backend/controllers/userController.js
 import User from '../models/userModel.js';
+import bcrypt from 'bcrypt';
 
 // Get all users
 export const getUsers = async (req, res) => {
@@ -27,8 +28,34 @@ export const getUserById = async (req, res) => {
 // Create a new user
 export const createUser = async (req, res) => {
   try {
-    const newUser = new User(req.body);
+    const { password, email } = req.body;
+    
+    // Password validation
+    if (!password || password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters long' });
+    }
+    
+    const userFound = await User.findOne({ email });
+    if (userFound) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Create new user with hashed password
+    const userData = {
+      ...req.body,
+      password: hashedPassword
+    };
+    
+    const newUser = new User(userData);
     const savedUser = await newUser.save();
+    
+    // Don't return the password in the response
+    savedUser.password = undefined;
+    
     res.status(201).json(savedUser);
   } catch (error) {
     res.status(400).json({ message: error.message });

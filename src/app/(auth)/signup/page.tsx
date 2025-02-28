@@ -4,7 +4,7 @@ import type React from "react";
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, Facebook } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Facebook } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import axiosInstance from "@/api/api";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,11 +28,30 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log({ firstName, lastName, email, password, agreeTerms });
+    const body = {
+      username: `${firstName} ${lastName}`,
+      email,
+      password,
+      role: "user",
+      createdAt: new Date(),
+    };
+
+    try {
+      const response = await axiosInstance.post("/api/users", body);
+      console.log(response);
+      if (response.status === 201) {
+        setError("");
+      } else {
+        setError("Failed to create account");
+      }
+    } catch (error: any) {
+      console.log("error", error);
+      setError(error.response.data.message);
+    }
   };
 
   return (
@@ -47,6 +67,12 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md flex items-start">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">

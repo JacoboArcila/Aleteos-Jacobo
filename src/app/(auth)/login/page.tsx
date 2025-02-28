@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
+/* import axios from "axios"; */
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,12 +29,12 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
+    /* try {
       const response = await axios.post("/api/auth/login", { email, password });
       console.log(response);
     } catch (error) {
       console.log(error);
-    }
+    } */
   };
 
   return (
