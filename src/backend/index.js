@@ -6,7 +6,9 @@ import connectDB from './config/db.js';
 
 // Import routes
 import userRoutes from './routes/userRoutes.js';
-
+import authRoutes from './routes/authRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 // Initialize express app
 const app = express();
 
@@ -19,6 +21,9 @@ app.use(express.json()); // Parses incoming JSON
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/products', productRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
@@ -26,11 +31,12 @@ app.get('/', (req, res) => {
 });
 
 // Error handling middleware
-app.use((err, req, res, ) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : {}
+    success: false,
+    message: 'Server Error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 

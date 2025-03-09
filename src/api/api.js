@@ -1,7 +1,5 @@
-// api.js - Base Axios instance with NextAuth integration
 
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
 
 /**
  * Create a configured Axios instance with default settings
@@ -20,13 +18,6 @@ const axiosInstance = axios.create({
  */
 axiosInstance.interceptors.request.use(
   async (config) => {
-    // Get session from NextAuth
-    const session = await getSession();
-    
-    // If session exists and has an access token, add it to the request
-    if (session?.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`;
-    }
     
     return config;
   },
@@ -52,7 +43,6 @@ axiosInstance.interceptors.response.use(
       
       // You might need to trigger a session refresh or redirect to sign-in
       // depending on your NextAuth configuration
-      window.location.href = '/api/auth/signin';
       return Promise.reject(error);
     }
     

@@ -36,18 +36,40 @@ const productSchema = new mongoose.Schema({
     type: String,
     default: 'default-product.jpg'
   },
+  // Optional reference to collection
+  collection: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Collection',
+    required: false
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Add virtual for checking if in stock
 productSchema.virtual('inStock').get(function() {
   return this.stock > 0;
+});
+
+// Add a virtual for collection name if it exists
+productSchema.virtual('collectionName').get(function() {
+  return this.collection ? this.collection.name : null;
+});
+
+// Pre-find middleware to populate collection if needed
+productSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'collection',
+    select: 'name'
+  });
+  next();
 });
 
 const Product = mongoose.model('Product', productSchema);
